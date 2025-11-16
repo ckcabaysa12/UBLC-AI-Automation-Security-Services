@@ -1,5 +1,6 @@
 // Replace with your deployed webhook
-const WEBHOOK_URL = "https://your-n8n-host/webhook/security-hook";
+const WEBHOOK_URL = "https://acceptable-contentment.up.railway.app/webhook/security-hook";
+
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
