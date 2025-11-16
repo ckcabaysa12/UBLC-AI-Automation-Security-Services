@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UBLC Intelligent Chatbot</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="branding">
+    <img src="ublc_logo.png" alt="UBLC" class="logo" />
+    <div>
+      <h1>UBLC Intelligent Chatbot</h1>
+      <p>Library • ICT • Admin • Security</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="chat">
+      <div id="messages" class="messages"></div>
+
+      <form id="chat-form" class="chat-form">
+        <label>
+          <span>Service:</span>
+          <select id="intent">
+            <option value="security_lost_found">Security: Lost & Found</option>
+            <option value="security_incident">Security: Incident</option>
+            <option value="security_emergency">Security: Emergency</option>
+            <option value="library_search">Library: Book Search</option>
+            <option value="ict_helpdesk">ICT: Helpdesk Ticket</option>
+            <option value="admin_clearance">Admin: Clearance Status</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Your message:</span>
+          <input id="message" placeholder="Describe your item or request..." required />
+        </label>
+
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <aside class="tips">
+      <h3>Tips</h3>
+      <ul>
+        <li><strong>Lost & Found:</strong> “Black umbrella found at library.”</li>
+        <li><strong>Incident:</strong> “Bicycle missing near main gate.”</li>
+        <li><strong>Emergency:</strong> “Medical emergency at gym.”</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <small>UBLC • CITEC • Final Exam Project</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
