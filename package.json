@@ -1,0 +1,11 @@
+{
+  "name": "ublc-ai-automation-securityservices",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "n8n"
+  },
+  "dependencies": {
+    "n8n": "^1.119.2",
+    "node-fetch": "^2.7.0"
+  }
+}
