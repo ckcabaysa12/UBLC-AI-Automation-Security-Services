@@ -1,16 +1,15 @@
 async function sendTest() {
   try {
-    const response = await fetch('http://localhost:5678/webhook-test/security-hook', {
+    const response = await fetch('https://n8n-production-e572.up.railway.app/webhook/security-hook', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        intent: "security_alert",
-        payload: {
-          Alert_Type: "Fire",
-          Triggered_By: "AI Alert",
-          Details: "Fire alarm triggered at Building C.",
-          Urgency_Level: "High"
-        }
+        type: "alert",  // use 'type' to match your n8n routing logic
+        alert_type: "Fire",
+        triggered_by: "AI Alert",
+        details: "Fire alarm triggered at Building C.",
+        urgency_level: "High",
+        date_triggered: new Date().toISOString()
       })
     });
 

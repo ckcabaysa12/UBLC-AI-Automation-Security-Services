@@ -17,6 +17,9 @@ formEl.addEventListener("submit", async (e) => {
   const payload = buildPayload(intent, text);
 
   try {
+    // Show typing indicator
+    addMsg("Assistant", "Typing...", "assistant");
+
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -24,11 +27,11 @@ formEl.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json().catch(() => ({}));
-    const ack = data?.status || data?.message || "Request logged.";
-    addMsg("Assistant", ack, "assistant");
+    const reply = data?.reply || "Your request has been logged.";
+    updateLastMsg(reply);
   } catch (err) {
     console.error("Error sending to backend:", err);
-    addMsg("Assistant", "Error sending to backend. Please try again.", "assistant");
+    updateLastMsg("Error sending to backend. Please try again.");
   }
 
   msgEl.value = "";
@@ -40,6 +43,11 @@ function addMsg(author, text, cls) {
   div.textContent = `${author}: ${text}`;
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function updateLastMsg(text) {
+  const last = messagesEl.querySelector(".msg.assistant:last-child");
+  if (last) last.textContent = `Assistant: ${text}`;
 }
 
 function buildPayload(intent, text) {
