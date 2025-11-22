@@ -1,4 +1,4 @@
-// Replace with your deployed webhook
+// ✅ Production webhook URL
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
 const messagesEl = document.getElementById("messages");
@@ -24,7 +24,7 @@ formEl.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json().catch(() => ({}));
-    const ack = data?.status || "Request logged.";
+    const ack = data?.status || data?.message || "Request logged.";
     addMsg("Assistant", ack, "assistant");
   } catch (err) {
     console.error("Error sending to backend:", err);
@@ -45,52 +45,49 @@ function addMsg(author, text, cls) {
 function buildPayload(intent, text) {
   const today = new Date().toISOString().slice(0, 10);
 
-  if (intent === "security_lost_found") {
-    return {
-      ItemName: text,
-      Description: "Submitted via chatbot",
-      LocationFound: "Unknown",
-      DateFound: today,
-      ClaimedBy: "",
-      ClaimStatus: "Unclaimed",
-      Notes: ""
-    };
-  }
+  switch (intent) {
+    case "security_lost_found":
+      return {
+        ItemName: text,
+        Description: "Submitted via chatbot",
+        LocationFound: "Unknown",
+        DateFound: today,
+        ClaimedBy: "",
+        ClaimStatus: "Unclaimed",
+        Notes: ""
+      };
 
-  if (intent === "security_incident") {
-    return {
-      Title: text,
-      Description: "Submitted via chatbot",
-      Location: "Unknown",
-      DateReported: today,
-      Severity: "Low",
-      Status: "Open",
-      Notes: ""
-    };
-  }
+    case "security_incident":
+      return {
+        Title: text,
+        Description: "Submitted via chatbot",
+        Location: "Unknown",
+        DateReported: today,
+        Severity: "Low",
+        Status: "Open",
+        Notes: ""
+      };
 
-  if (intent === "security_alert") {
-    return {
-      Summary: text,
-      Location: "Unknown",
-      ReportedAt: new Date().toISOString(),
-      Priority: "High",
-      ActionTaken: "Pending",
-      Notes: ""
-    };
-  }
+    case "security_alert":
+      return {
+        Summary: text,
+        Location: "Unknown",
+        ReportedAt: new Date().toISOString(),
+        Priority: "High",
+        ActionTaken: "Pending",
+        Notes: ""
+      };
 
-  if (intent === "library_search") {
-    return { Query: text };
-  }
+    case "library_search":
+      return { Query: text };
 
-  if (intent === "ict_helpdesk") {
-    return { Subject: text, RequestedAt: today };
-  }
+    case "ict_helpdesk":
+      return { Subject: text, RequestedAt: today };
 
-  if (intent === "admin_clearance") {
-    return { StudentID: text, Request: "Clearance status" };
-  }
+    case "admin_clearance":
+      return { StudentID: text, Request: "Clearance status" };
 
-  return { Notes: text };
+    default:
+      return { Notes: text };
+  }
 }
