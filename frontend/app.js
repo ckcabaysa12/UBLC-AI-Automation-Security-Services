@@ -1,6 +1,5 @@
 // Replace with your deployed webhook
-const WEBHOOK_URL = "https://acceptable-contentment.up.railway.app/webhook/security-hook";
-
+const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -21,13 +20,14 @@ formEl.addEventListener("submit", async (e) => {
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ intent, payload })
+      body: JSON.stringify({ intent, ...payload })
     });
 
     const data = await res.json().catch(() => ({}));
     const ack = data?.status || "Request logged.";
     addMsg("Assistant", ack, "assistant");
   } catch (err) {
+    console.error("Error sending to backend:", err);
     addMsg("Assistant", "Error sending to backend. Please try again.", "assistant");
   }
 
@@ -47,7 +47,6 @@ function buildPayload(intent, text) {
 
   if (intent === "security_lost_found") {
     return {
-      ItemID: `LF-${Date.now()}`,
       ItemName: text,
       Description: "Submitted via chatbot",
       LocationFound: "Unknown",
@@ -60,7 +59,6 @@ function buildPayload(intent, text) {
 
   if (intent === "security_incident") {
     return {
-      IncidentID: `INC-${Date.now()}`,
       Title: text,
       Description: "Submitted via chatbot",
       Location: "Unknown",
@@ -73,7 +71,6 @@ function buildPayload(intent, text) {
 
   if (intent === "security_alert") {
     return {
-      EmergencyID: `EM-${Date.now()}`,
       Summary: text,
       Location: "Unknown",
       ReportedAt: new Date().toISOString(),
@@ -83,13 +80,14 @@ function buildPayload(intent, text) {
     };
   }
 
-  // Stubs for other departments:
   if (intent === "library_search") {
     return { Query: text };
   }
+
   if (intent === "ict_helpdesk") {
     return { Subject: text, RequestedAt: today };
   }
+
   if (intent === "admin_clearance") {
     return { StudentID: text, Request: "Clearance status" };
   }
