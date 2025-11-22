@@ -14,7 +14,10 @@ formEl.addEventListener("submit", async (e) => {
 
   addMsg("You", text, "you");
 
-  const payload = buildPayload(intent, text);
+  // ✅ Detect if user is asking a question
+  const isQuestion = text.endsWith("?");
+
+  const payload = buildPayload(intent, text, isQuestion);
 
   try {
     // Show typing indicator
@@ -27,7 +30,15 @@ formEl.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json().catch(() => ({}));
-    const reply = data?.reply || "Your request has been logged.";
+
+    // ✅ Prefer backend reply, but fallback if missing
+    let reply;
+    if (isQuestion) {
+      reply = "I can’t directly check item status yet, but your question has been noted.";
+    } else {
+      reply = data?.reply || "Your request has been logged.";
+    }
+
     updateLastMsg(reply);
   } catch (err) {
     console.error("Error sending to backend:", err);
@@ -50,8 +61,13 @@ function updateLastMsg(text) {
   if (last) last.textContent = `Assistant: ${text}`;
 }
 
-function buildPayload(intent, text) {
+function buildPayload(intent, text, isQuestion) {
   const today = new Date().toISOString().slice(0, 10);
+
+  // ✅ If it's a question, don’t log to Airtable — just return minimal payload
+  if (isQuestion) {
+    return { Notes: text, Question: true };
+  }
 
   switch (intent) {
     case "security_lost_found":
