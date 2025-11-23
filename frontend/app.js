@@ -1,13 +1,13 @@
-// ✅ Production webhook URL (n8n → Airtable)
-const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
-
-// ✅ Load Cohere API key from .env
+// ✅ Load environment variables
 require('dotenv').config();
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
 
+// ✅ Webhook URL for n8n → Airtable
+const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
+
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
-const intentEl = document.getElementById("intent"); // dropdown for service
+const intentEl = document.getElementById("intent");
 const msgEl = document.getElementById("message");
 
 // ==============================
@@ -135,7 +135,7 @@ function buildPayload(intent, text, flags = {}) {
   }
 }
 
-// ✅ Cohere AI Reply
+// ✅ Cohere AI Reply Function
 async function getAIReply(text) {
   try {
     const res = await fetch("https://api.cohere.ai/v1/generate", {
