@@ -1,8 +1,8 @@
 // ✅ Webhook URL for n8n → Airtable
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
-// ✅ Cohere API key (frontend-safe for now; move to backend later)
-const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92"; 
+// ✅ Cohere API key (frontend-safe for now; move to backend later for security)
+const COHERE_API_KEY = "YOUR_REGENERATED_KEY_HERE"; 
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -37,8 +37,8 @@ formEl.addEventListener("submit", async (e) => {
     const data = await res.json().catch(() => ({}));
     const aiReply = await getAIReply(text);
 
-    // ✅ Simplified reply logic
-    const reply = data?.reply || aiReply || (
+    // ✅ Simplified reply logic: AI reply always prioritized
+    const reply = aiReply || data?.reply || (
       isQuestion
         ? "I can't directly check item status yet, but your question has been noted."
         : "Your request has been logged."
