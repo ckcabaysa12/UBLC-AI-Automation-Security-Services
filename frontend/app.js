@@ -1,9 +1,6 @@
 // ✅ Webhook URL for n8n → Airtable
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
-// ✅ Cohere API key (frontend-safe for now; replace with regenerated key)
-const COHERE_API_KEY = "dNPm34QwzX0deKc7VVQoeoSSmGC71vc6Dp22CF0W";
-
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
 const intentEl = document.getElementById("intent");
@@ -23,11 +20,12 @@ formEl.addEventListener("submit", async (e) => {
   const isQuestion = /\?\s*$/.test(text);
   const policyIntent = detectPolicyIntent(text);
   const intent = policyIntent || (isQuestion ? "query_check" : selectedIntent);
-  const payload = buildPayload(intent, text, { isQuestion, policyIntent });
+  const payload = buildPayload(intent, text);
 
   try {
     addMsg("Assistant", "Typing...", "assistant");
 
+    // ✅ Send to n8n webhook
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,9 +33,11 @@ formEl.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json().catch(() => ({}));
+
+    // ✅ Get AI reply from Flask backend
     const aiReply = await getAIReply(text);
 
-    // ✅ AI reply prioritized, fallback only if null
+    // ✅ Prioritize AI reply, fallback to webhook or default
     const reply = aiReply || data?.reply || (
       isQuestion
         ? "I can't directly check item status yet, but your question has been noted."
@@ -79,87 +79,25 @@ function detectPolicyIntent(text) {
   return null;
 }
 
-function buildPayload(intent, text, flags = {}) {
+function buildPayload(intent, text) {
   const today = new Date().toISOString().slice(0, 10);
-
-  if (intent === "query_check") {
-    return { QueryText: text, Question: true };
-  }
-  if (intent.startsWith("policy_")) {
-    return { PolicyQuery: text };
-  }
-
-  switch (intent) {
-    case "security_lost_found":
-      return {
-        ItemName: text,
-        Description: "Submitted via chatbot",
-        LocationFound: "Unknown",
-        DateFound: today,
-        ClaimedBy: "",
-        ClaimStatus: "Unclaimed",
-        Notes: ""
-      };
-
-    case "security_incident":
-      return {
-        Title: text,
-        Description: "Submitted via chatbot",
-        Location: "Unknown",
-        DateReported: today,
-        Severity: "Low",
-        Status: "Open",
-        Notes: ""
-      };
-
-    case "security_alert":
-      return {
-        Summary: text,
-        Location: "Unknown",
-        ReportedAt: new Date().toISOString(),
-        Priority: "High",
-        ActionTaken: "Pending",
-        Notes: ""
-      };
-
-    case "library_search":
-      return { Query: text };
-
-    case "ict_helpdesk":
-      return { Subject: text, RequestedAt: today };
-
-    case "admin_clearance":
-      return { StudentID: text, Request: "Clearance status" };
-
-    default:
-      return { Notes: text };
-  }
+  if (intent === "query_check") return { QueryText: text, Question: true };
+  if (intent.startsWith("policy_")) return { PolicyQuery: text };
+  return { Notes: text, DateReported: today };
 }
 
-// ✅ Cohere AI Reply Function with Debug Logs
+// ✅ Call Flask backend for Cohere reply
 async function getAIReply(text) {
   try {
-    console.log("Calling Cohere with:", text);
-    console.log("Using API Key:", COHERE_API_KEY);
-
-    const res = await fetch("https://api.cohere.ai/v1/generate", {
+    const res = await fetch("http://127.0.0.1:5000/chat", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${COHERE_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "command",
-        prompt: text,
-        max_tokens: 100,
-        temperature: 0.7
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
     });
     const data = await res.json();
-    console.log("Cohere response:", data); // 🔍 Debug log
-    return data.generations?.[0]?.text.trim() || null;
+    return data.reply || null;
   } catch (err) {
-    console.error("Cohere error:", err);
+    console.error("Backend Cohere error:", err);
     return null;
   }
 }
