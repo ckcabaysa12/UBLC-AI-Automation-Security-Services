@@ -2,7 +2,7 @@
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
 // ✅ Cohere API key (frontend-safe for now; move to backend later for security)
-const COHERE_API_KEY = "YOUR_REGENERATED_KEY_HERE"; 
+const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92"; 
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
