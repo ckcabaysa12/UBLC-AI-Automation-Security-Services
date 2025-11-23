@@ -1,8 +1,8 @@
 // ✅ Webhook URL for n8n → Airtable
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
-// ✅ Cohere API key (frontend-safe for now; move to backend later for security)
-const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92"; 
+// ✅ Cohere API key (frontend-safe for now; replace with regenerated key)
+const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92";
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -37,7 +37,7 @@ formEl.addEventListener("submit", async (e) => {
     const data = await res.json().catch(() => ({}));
     const aiReply = await getAIReply(text);
 
-    // ✅ Simplified reply logic: AI reply always prioritized
+    // ✅ AI reply prioritized, fallback only if null
     const reply = aiReply || data?.reply || (
       isQuestion
         ? "I can't directly check item status yet, but your question has been noted."
@@ -136,9 +136,12 @@ function buildPayload(intent, text, flags = {}) {
   }
 }
 
-// ✅ Cohere AI Reply Function
+// ✅ Cohere AI Reply Function with Debug Logs
 async function getAIReply(text) {
   try {
+    console.log("Calling Cohere with:", text);
+    console.log("Using API Key:", COHERE_API_KEY);
+
     const res = await fetch("https://api.cohere.ai/v1/generate", {
       method: "POST",
       headers: {
@@ -153,7 +156,7 @@ async function getAIReply(text) {
       })
     });
     const data = await res.json();
-    console.log("Cohere response:", data); // Debug log
+    console.log("Cohere response:", data); // 🔍 Debug log
     return data.generations?.[0]?.text.trim() || null;
   } catch (err) {
     console.error("Cohere error:", err);
