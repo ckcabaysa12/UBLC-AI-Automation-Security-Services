@@ -1,8 +1,8 @@
 // ✅ Webhook URL for n8n → Airtable
 const WEBHOOK_URL = "https://n8n-production-e572.up.railway.app/webhook/security-hook";
 
-// ✅ Cohere API key (frontend-safe for now)
-const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92"; // Replace with regenerated key if needed
+// ✅ Cohere API key (frontend-safe for now; move to backend later)
+const COHERE_API_KEY = "xoVJN8ZuS9FNQw5zgbYWYrQG7ZKwiVQ5PpjCXy92"; 
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -37,10 +37,12 @@ formEl.addEventListener("submit", async (e) => {
     const data = await res.json().catch(() => ({}));
     const aiReply = await getAIReply(text);
 
-    const reply = data?.reply
-      || (isQuestion
-          ? "I can't directly check item status yet, but your question has been noted."
-          : aiReply || "Your request has been logged.");
+    // ✅ Simplified reply logic
+    const reply = data?.reply || aiReply || (
+      isQuestion
+        ? "I can't directly check item status yet, but your question has been noted."
+        : "Your request has been logged."
+    );
 
     updateLastMsg(reply);
   } catch (err) {
@@ -151,6 +153,7 @@ async function getAIReply(text) {
       })
     });
     const data = await res.json();
+    console.log("Cohere response:", data); // Debug log
     return data.generations?.[0]?.text.trim() || null;
   } catch (err) {
     console.error("Cohere error:", err);
