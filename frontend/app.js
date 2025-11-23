@@ -39,9 +39,10 @@ formEl.addEventListener("submit", async (e) => {
     const aiReply = await getAIReply(text);
 
     const reply = data?.reply
-      || (isQuestion ? "I can’t directly check item status yet, but your question has been noted.")
-      || aiReply
-      || "Your request has been logged.";
+  || (isQuestion
+      ? "I can't directly check item status yet, but your question has been noted."
+      : aiReply || "Your request has been logged.");
+
 
     updateLastMsg(reply);
   } catch (err) {
